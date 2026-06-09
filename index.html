@@ -697,7 +697,7 @@ canvas {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 20px "Courier New", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('按 Enter 开始游戏', canvas.width / 2, canvas.height / 2 + 120);
+      ctx.fillText('按 Enter / 点击屏幕 开始游戏', canvas.width / 2, canvas.height / 2 + 120);
     }
 
     ctx.fillStyle = '#666';
@@ -716,10 +716,7 @@ canvas {
   }
 
   function update(dtSec) {
-    if (state === STATE.START) {
-      startBlink += dtSec;
-      return;
-    }
+    if (state === STATE.START) return;
     if (state !== STATE.PLAYING) return;
 
     const cap = 0.05;
@@ -757,8 +754,8 @@ canvas {
 
     if (invulnTimer > 0) {
       invulnTimer -= sdt;
-      player.hp = 2;
-      if (invulnTimer <= 0) player.hp = 1;
+      if (player.hp <= 1) player.hp = 2;
+      if (invulnTimer <= 0 && player.hp <= 2) player.hp = 1;
     }
 
     // enemy AI
@@ -936,6 +933,11 @@ canvas {
     });
     btn.addEventListener('pointerup', e => { e.preventDefault(); keys[btn.dataset.key] = false; });
     btn.addEventListener('pointerleave', e => { keys[btn.dataset.key] = false; });
+  });
+
+  canvas.addEventListener('click', () => {
+    initAudio();
+    if (state === STATE.START) resetGame();
   });
 
   state = STATE.START;
